@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
+import com.vti_student.user_management.dto.request.UserFilter;
 import com.vti_student.user_management.model.User;
 
 public interface UserService {
@@ -16,5 +17,5 @@ public interface UserService {
 
     public String deleteUser(Integer userId);
 
-    public List<User> searchFirstName(String firstName);
+    public List<User> search(UserFilter userFilter);
 }

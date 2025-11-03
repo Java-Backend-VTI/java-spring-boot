@@ -1,6 +1,7 @@
 package com.vti_student.user_management.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -42,14 +43,13 @@ public class GroupServiceImpl implements GroupService {
             throw new BusinessException("groupId must not be Null");
         }
 
-        if (groupDto.getName() != null) {
-            throw new BusinessException("Group name must not be Null");
-        }
+        Optional<Group> existing = groupRepository.findById(groupId);
 
-        Group existing = groupRepository.findById(groupId).orElseThrow(() -> new BusinessException("Group not found"));
-        existing.setName(groupDto.getName());
+        Group actualGroup = existing.get();
 
-        return groupRepository.save(existing);
+        actualGroup.setName(groupDto.getName());
+
+        return groupRepository.save(actualGroup);
     }
 
     @Override
@@ -68,9 +68,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<Group> searchName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new BusinessException("Name must not be empty");
-        }
         return groupRepository.findByName(name);
     };
 

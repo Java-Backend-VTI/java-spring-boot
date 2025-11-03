@@ -1,15 +1,19 @@
 package com.vti_student.user_management.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
+import com.vti_student.user_management.dto.request.UserFilter;
 import com.vti_student.user_management.exception.BusinessException;
 import com.vti_student.user_management.model.User;
 import com.vti_student.user_management.repository.UserRepository;
 import com.vti_student.user_management.service.UserService;
+import com.vti_student.user_management.specification.UserSpecification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,13 +29,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(CreateUserRequest user) {
-        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
-            throw new BusinessException("First Name must not be Null");
-        }
-
-        if (user.getLastName() == null || user.getLastName().isBlank()) {
-            throw new BusinessException("Last Name must not be Null");
-        }
 
         User validateUser = new User();
         validateUser.setFirstName(user.getFirstName());
@@ -49,23 +46,21 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("UserId must not be Null");
         }
 
-        User existing = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("User not found"));
+        // Validate before update
 
-        if (userDto.getFirstName() != null) {
-            existing.setFirstName(userDto.getFirstName());
-        }
-        if (userDto.getLastName() != null) {
-            existing.setLastName(userDto.getLastName());
-        }
-        if (userDto.getAddress() != null) {
-            existing.setAddress(userDto.getAddress());
-        }
-        if (userDto.getBirthday() != null) {
-            existing.setBirthday(userDto.getBirthday());
+        Optional<User> existing = userRepository.findById(userId);
+
+        if (existing.isEmpty()) {
+            new BusinessException("User not found");
         }
 
-        return userRepository.save(existing);
+        User actualUser = existing.get();
+        actualUser.setBirthday(userDto.getBirthday());
+        actualUser.setLastName(userDto.getLastName());
+        actualUser.setFirstName(userDto.getFirstName());
+        actualUser.setAddress(userDto.getAddress());
+
+        return userRepository.save(actualUser);
     }
 
     @Override
@@ -84,11 +79,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchFirstName(String firstName) {
-        if (firstName == null || firstName.isBlank()) {
-            throw new BusinessException("First name must not be empty");
+    public List<User> search(UserFilter userFilter) {
+        // Nhieu truong hop xay ra
+
+        String firstName = userFilter.getFirstName();
+        String lastName = userFilter.getLastName();
+        String address = userFilter.getAddress();
+
+        Specification<User> spec = Specification.where((Specification<User>) null);
+
+        if (firstName != null && !firstName.isBlank()) {
+            spec = spec.and(UserSpecification.hasFirstNameLink(firstName));
         }
-        return userRepository.findByFirstName(firstName);
+
+        if (lastName != null && !lastName.isBlank()) {
+            spec = spec.and(UserSpecification.hasLastNameLink(lastName));
+        }
+
+        if (address != null && !address.isBlank()) {
+            spec = spec.and(UserSpecification.hasAddressLink(address));
+        }
+
+        return userRepository.findAll(spec);
     }
 
 }

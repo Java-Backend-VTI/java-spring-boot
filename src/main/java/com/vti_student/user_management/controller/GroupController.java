@@ -17,6 +17,7 @@ import com.vti_student.user_management.dto.request.UpdateGroupRequest;
 import com.vti_student.user_management.model.Group;
 import com.vti_student.user_management.service.GroupService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,12 +32,12 @@ public class GroupController {
     }
 
     @PostMapping
-    public Group addNewGroup(@RequestBody CreateGroupRequest group) {
+    public Group addNewGroup(@RequestBody @Valid CreateGroupRequest group) {
         return groupService.addNewGroup(group);
     }
 
     @PutMapping("{groupId}")
-    public Group updateUser(@PathVariable("groupId") Integer groupId, @RequestBody UpdateGroupRequest groupDto) {
+    public Group updateUser(@PathVariable("groupId") Integer groupId, @RequestBody @Valid UpdateGroupRequest groupDto) {
         return groupService.updateGroup(groupId, groupDto);
     }
 
@@ -46,7 +47,7 @@ public class GroupController {
     }
 
     @GetMapping("search")
-    public List<Group> searchFirstName(@RequestParam String firstName) {
-        return groupService.searchName(firstName);
+    public List<Group> searchFirstName(@RequestParam(name = "name") String name) {
+        return groupService.searchName(name);
     }
 }

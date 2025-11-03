@@ -9,14 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
+import com.vti_student.user_management.dto.request.UserFilter;
 import com.vti_student.user_management.model.User;
 import com.vti_student.user_management.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -43,12 +44,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody CreateUserRequest user) {
+    public User addUser(@RequestBody @Valid CreateUserRequest user) {
         return userService.addUser(user);
     }
 
     @PutMapping("{userId}")
-    public User updateUser(@PathVariable("userId") Integer userId, @RequestBody UpdateUserRequest userDto) {
+    public User updateUser(@PathVariable("userId") Integer userId, @RequestBody @Valid UpdateUserRequest userDto) {
         return userService.updateUser(userId, userDto);
     }
 
@@ -58,8 +59,8 @@ public class UserController {
     }
 
     @GetMapping("search")
-    public List<User> searchFirstName(@RequestParam String firstName) {
-        return userService.searchFirstName(firstName);
+    public List<User> searchFirstName(UserFilter userFilter) {
+        return userService.search(userFilter);
     }
 
 }
