@@ -1,6 +1,10 @@
 package com.vti_student.user_management.service;
 
+import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
@@ -9,7 +13,7 @@ import com.vti_student.user_management.model.User;
 
 public interface UserService {
 
-    public List<User> getAll();
+    public Page<User> getAll(Pageable pageable);
 
     public User addUser(CreateUserRequest user);
 
@@ -17,5 +21,7 @@ public interface UserService {
 
     public String deleteUser(Integer userId);
 
-    public List<User> search(UserFilter userFilter);
+    public Page<User> search(UserFilter userFilter);
+
+    public List<User> collectByDate(Date formDate, Date toDate);
 }

@@ -1,8 +1,12 @@
 package com.vti_student.user_management.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +27,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public Page<User> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> search(UserFilter userFilter) {
+    public Page<User> search(UserFilter userFilter) {
         // Nhieu truong hop xay ra
 
         String firstName = userFilter.getFirstName();
@@ -100,7 +104,14 @@ public class UserServiceImpl implements UserService {
             spec = spec.and(UserSpecification.hasAddressLink(address));
         }
 
-        return userRepository.findAll(spec);
+        Pageable pageable = PageRequest.of(userFilter.getPage(), userFilter.getSize());
+
+        return userRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public List<User> collectByDate(Date fromDate, Date toDate) {
+        return userRepository.findByBirthdayBetweenSQL(fromDate, toDate);
     }
 
 }
