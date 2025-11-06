@@ -9,7 +9,4 @@ public class UserFilter {
     private String firstName;
     private String lastName;
     private String address;
-
-    private Integer page = 0;
-    private Integer size = 10;
 }

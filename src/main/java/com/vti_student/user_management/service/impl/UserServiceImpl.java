@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> search(UserFilter userFilter) {
+    public Page<User> search(UserFilter userFilter, Pageable pageable) {
         // Nhieu truong hop xay ra
 
         String firstName = userFilter.getFirstName();
@@ -103,8 +103,6 @@ public class UserServiceImpl implements UserService {
         if (address != null && !address.isBlank()) {
             spec = spec.and(UserSpecification.hasAddressLink(address));
         }
-
-        Pageable pageable = PageRequest.of(userFilter.getPage(), userFilter.getSize());
 
         return userRepository.findAll(spec, pageable);
     }

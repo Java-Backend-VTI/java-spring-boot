@@ -21,7 +21,7 @@ public interface UserService {
 
     public String deleteUser(Integer userId);
 
-    public Page<User> search(UserFilter userFilter);
+    public Page<User> search(UserFilter userFilter, Pageable pageable);
 
     public List<User> collectByDate(Date formDate, Date toDate);
 }

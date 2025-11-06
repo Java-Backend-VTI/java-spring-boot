@@ -69,8 +69,8 @@ public class UserController {
     }
 
     @GetMapping("search")
-    public Page<User>  search(UserFilter userFilter) {
-        return userService.search(userFilter);
+    public Page<User> search(UserFilter userFilter, Pageable pageable) {
+        return userService.search(userFilter, pageable);
     }
 
     @GetMapping("collect")
