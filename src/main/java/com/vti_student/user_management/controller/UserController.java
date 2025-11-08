@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vti_student.user_management.common.BaseResponse;
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
 import com.vti_student.user_management.dto.request.UserFilter;
@@ -49,34 +51,46 @@ public class UserController {
     // }
 
     @GetMapping
-    public Page<User> getAll(Pageable pageable) {
-        return userService.getAll(pageable);
+    public ResponseEntity<BaseResponse<Page<User>>> getAll(Pageable pageable) {
+        /**
+         * Response:
+         * Status
+         * Message
+         * Data
+         */
+        return ResponseEntity.ok(new BaseResponse<>(userService.getAll(pageable), "Get data successfully"));
     }
 
     @PostMapping
-    public User addUser(@RequestBody @Valid CreateUserRequest user) {
-        return userService.addUser(user);
+    public ResponseEntity<BaseResponse<User>> addUser(@RequestBody @Valid CreateUserRequest user) {
+        return ResponseEntity.ok(new BaseResponse<>(userService.addUser(user), "User is created successfully"));
     }
 
     @PutMapping("{userId}")
-    public User updateUser(@PathVariable("userId") Integer userId, @RequestBody @Valid UpdateUserRequest userDto) {
-        return userService.updateUser(userId, userDto);
+    public ResponseEntity<BaseResponse<User>> updateUser(@PathVariable("userId") Integer userId,
+            @RequestBody @Valid UpdateUserRequest userDto) {
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.updateUser(userId, userDto), "User is updated successfully"));
     }
 
     @DeleteMapping("{userId}")
-    public String deleteUser(@PathVariable("userId") Integer userId) {
-        return userService.deleteUser(userId);
+    public ResponseEntity<BaseResponse<String>> deleteUser(@PathVariable("userId") Integer userId) {
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.deleteUser(userId), "Delete user successfully"));
     }
 
     @GetMapping("search")
-    public Page<User> search(UserFilter userFilter, Pageable pageable) {
-        return userService.search(userFilter, pageable);
+    public ResponseEntity<BaseResponse<Page<User>>> search(UserFilter userFilter, Pageable pageable) {
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.search(userFilter, pageable), "Get users successfully"));
     }
 
     @GetMapping("collect")
-    public List<User> collectByDate(
+    public ResponseEntity<BaseResponse<List<User>>> collectByDate(
             @RequestParam(name = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
             @RequestParam(name = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate) {
-        return userService.collectByDate(fromDate, toDate);
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.collectByDate(fromDate, toDate),
+                        "Get users by base on Date successfully"));
     }
 }

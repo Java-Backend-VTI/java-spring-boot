@@ -4,11 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public Page<User> getAll(Pageable pageable) {
@@ -32,18 +34,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User addUser(CreateUserRequest user) {
-
-        User validateUser = new User();
-        validateUser.setFirstName(user.getFirstName());
-        validateUser.setLastName(user.getLastName());
-        validateUser.setAddress(user.getAddress());
-        validateUser.setBirthday(user.getBirthday());
-
+        User validateUser = modelMapper.map(user, User.class);
         return userRepository.save(validateUser);
     }
 
     @Override
+    @Transactional
     public User updateUser(Integer userId, UpdateUserRequest userDto) {
 
         if (userId == null) {
@@ -68,6 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String deleteUser(Integer userId) {
 
         if (userId == null) {

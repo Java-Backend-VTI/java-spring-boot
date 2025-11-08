@@ -3,7 +3,9 @@ package com.vti_student.user_management.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vti_student.user_management.dto.request.CreateGroupRequest;
 import com.vti_student.user_management.dto.request.UpdateGroupRequest;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<Group> getAll() {
@@ -25,18 +28,14 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public Group addNewGroup(CreateGroupRequest group) {
-        if (group.getName() == null || group.getName().isBlank()) {
-            throw new BusinessException("Group name must not be Null");
-        }
-
-        Group groupDto = new Group();
-        groupDto.setName(group.getName());
-
-        return groupRepository.save(groupDto);
+        Group groupNew = modelMapper.map(group, Group.class);
+        return groupRepository.save(groupNew);
     }
 
     @Override
+    @Transactional
     public Group updateGroup(Integer groupId, UpdateGroupRequest groupDto) {
 
         if (groupId == null) {
@@ -53,6 +52,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteGroup(Integer groupId) {
         if (groupId == null) {
             throw new BusinessException("Group Id must not be Null");
