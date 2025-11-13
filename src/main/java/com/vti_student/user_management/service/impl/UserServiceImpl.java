@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -122,9 +124,11 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException(username + " Not Found");
         }
 
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPassword(),
-                new ArrayList<>());
+                authorities);
     }
 
 }
