@@ -15,6 +15,8 @@ import com.vti_student.user_management.model.User;
 public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
     List<User> findByFirstName(String firstName);
 
+    User findByUsername(String username);
+
     List<User> findByFirstNameContainingIgnoreCase(String firstName);
 
     List<User> findByLastNameContainingIgnoreCaseAndFirstNameContainingIgnoreCase(String firstName, String lastName);

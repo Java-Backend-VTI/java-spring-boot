@@ -69,6 +69,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<Group> searchName(String name) {
         return groupRepository.findByName(name);
-    };
+    }
+
+    @Override
+    public List<Group> findByUserId(Integer userId) {
+        return groupRepository.findByUserId(userId);
+    }
 
 }

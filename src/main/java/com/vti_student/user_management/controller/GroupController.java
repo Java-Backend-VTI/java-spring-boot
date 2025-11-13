@@ -58,4 +58,9 @@ public class GroupController {
         return ResponseEntity
                 .ok(new BaseResponse<>(groupService.searchName(name), "Search group successfully"));
     }
+
+    @GetMapping("users/{userId}")
+    public List<Group> getGroupsByUser(@PathVariable Integer userId) {
+        return groupService.findByUserId(userId);
+    }
 }

@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
 import com.vti_student.user_management.dto.request.UserFilter;
 import com.vti_student.user_management.model.User;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
     public Page<User> getAll(Pageable pageable);
 

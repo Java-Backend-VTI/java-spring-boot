@@ -16,4 +16,7 @@ public interface GroupService {
     public Boolean deleteGroup(Integer groupId);
 
     public List<Group> searchName(String name);
+
+    public List<Group> findByUserId(Integer userId);
+
 }
