@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.vti_student.user_management.model.UserGroupMapping;
 
 public interface UserGroupMappingRepository
-        extends JpaRepository<UserGroupMapping, Integer>, JpaSpecificationExecutor<UserGroupMapping> {
-
+                extends JpaRepository<UserGroupMapping, Integer>, JpaSpecificationExecutor<UserGroupMapping> {
+        void deleteByUserId(Integer userId);
 }

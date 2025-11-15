@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.vti_student.user_management.dto.request.ChangPassword;
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
 import com.vti_student.user_management.dto.request.UserFilter;
@@ -25,4 +26,8 @@ public interface UserService extends UserDetailsService {
     public Page<User> search(UserFilter userFilter, Pageable pageable);
 
     public List<User> collectByDate(Date formDate, Date toDate);
+
+    public User changePassword(ChangPassword changPasswordDto);
+
+    public String softDeleteUser(Integer userId);
 }

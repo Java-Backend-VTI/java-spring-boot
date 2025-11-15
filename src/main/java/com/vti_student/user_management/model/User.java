@@ -2,8 +2,12 @@ package com.vti_student.user_management.model;
 
 import java.util.Date;
 
+import com.vti_student.user_management.common.UserRole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +36,12 @@ public class User {
 
     private String password;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserRole role;
 
     private String username;
+
+    private Boolean deleted = false;
+
 }

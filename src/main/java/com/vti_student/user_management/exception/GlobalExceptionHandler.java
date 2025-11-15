@@ -18,12 +18,12 @@ public class GlobalExceptionHandler {
                                 .badRequest().body(new BaseResponse<>(null, exception.getMessage()));
         }
 
-        @ExceptionHandler(Exception.class)
-        public ResponseEntity<BaseResponse<Object>> handleBusinessException(Exception exception,
-                        ServletRequest ServletWebRequest) {
-                return ResponseEntity
-                                .badRequest().body(new BaseResponse<>(null, "System error"));
-        }
+        // @ExceptionHandler(Exception.class)
+        // public ResponseEntity<BaseResponse<Object>> handleBusinessException(Exception exception,
+        //                 ServletRequest ServletWebRequest) {
+        //         return ResponseEntity
+        //                         .badRequest().body(new BaseResponse<>(null, "System error"));
+        // }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<BaseResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {

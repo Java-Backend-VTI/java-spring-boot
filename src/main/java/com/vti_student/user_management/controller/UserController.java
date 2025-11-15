@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vti_student.user_management.common.BaseResponse;
+import com.vti_student.user_management.dto.request.ChangPassword;
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
 import com.vti_student.user_management.dto.request.UserFilter;
@@ -64,11 +65,13 @@ public class UserController {
         return ResponseEntity.ok(new BaseResponse<>(userService.getAll(pageable), "Get data successfully"));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<BaseResponse<User>> addUser(@RequestBody @Valid CreateUserRequest user) {
         return ResponseEntity.ok(new BaseResponse<>(userService.addUser(user), "User is created successfully"));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{userId}")
     public ResponseEntity<BaseResponse<User>> updateUser(@PathVariable("userId") Integer userId,
             @RequestBody @Valid UpdateUserRequest userDto) {
@@ -95,5 +98,17 @@ public class UserController {
         return ResponseEntity
                 .ok(new BaseResponse<>(userService.collectByDate(fromDate, toDate),
                         "Get users by base on Date successfully"));
+    }
+
+    @PutMapping("change-password")
+    public ResponseEntity<BaseResponse<User>> changePassword(@RequestBody @Valid ChangPassword passwordDto) {
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.changePassword(passwordDto), "Password is updated successfully"));
+    }
+
+    @DeleteMapping("{userId}/softDelete")
+    public ResponseEntity<BaseResponse<String>> softDeleteUser(@PathVariable("userId") Integer userId) {
+        return ResponseEntity
+                .ok(new BaseResponse<>(userService.softDeleteUser(userId), "Delete user successfully"));
     }
 }

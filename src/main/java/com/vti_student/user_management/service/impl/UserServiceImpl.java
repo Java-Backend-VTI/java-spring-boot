@@ -1,6 +1,5 @@
 package com.vti_student.user_management.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,14 +12,18 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vti_student.user_management.common.UserRole;
+import com.vti_student.user_management.dto.request.ChangPassword;
 import com.vti_student.user_management.dto.request.CreateUserRequest;
 import com.vti_student.user_management.dto.request.UpdateUserRequest;
 import com.vti_student.user_management.dto.request.UserFilter;
 import com.vti_student.user_management.exception.BusinessException;
 import com.vti_student.user_management.model.User;
+import com.vti_student.user_management.repository.UserGroupMappingRepository;
 import com.vti_student.user_management.repository.UserRepository;
 import com.vti_student.user_management.service.UserService;
 import com.vti_student.user_management.specification.UserSpecification;
@@ -31,7 +34,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserGroupMappingRepository userGroupMappingRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Page<User> getAll(Pageable pageable) {
@@ -41,6 +46,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User addUser(CreateUserRequest user) {
+        String encodedNewPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedNewPassword);
         User validateUser = modelMapper.map(user, User.class);
         return userRepository.save(validateUser);
     }
@@ -53,8 +60,6 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("UserId must not be Null");
         }
 
-        // Validate before update
-
         Optional<User> existing = userRepository.findById(userId);
 
         if (existing.isEmpty()) {
@@ -66,7 +71,6 @@ public class UserServiceImpl implements UserService {
         actualUser.setLastName(userDto.getLastName());
         actualUser.setFirstName(userDto.getFirstName());
         actualUser.setAddress(userDto.getAddress());
-
         return userRepository.save(actualUser);
     }
 
@@ -81,6 +85,7 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("User not found"));
 
+        userGroupMappingRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
 
         return "Delete User successfully with UserID: " + userId;
@@ -93,6 +98,7 @@ public class UserServiceImpl implements UserService {
         String firstName = userFilter.getFirstName();
         String lastName = userFilter.getLastName();
         String address = userFilter.getAddress();
+        UserRole role = userFilter.getRole();
 
         Specification<User> spec = Specification.where((Specification<User>) null);
 
@@ -106,6 +112,10 @@ public class UserServiceImpl implements UserService {
 
         if (address != null && !address.isBlank()) {
             spec = spec.and(UserSpecification.hasAddressLink(address));
+        }
+
+        if (role != null) {
+            spec = spec.and(UserSpecification.hasUserRoleLink(role));
         }
 
         return userRepository.findAll(spec, pageable);
@@ -131,4 +141,43 @@ public class UserServiceImpl implements UserService {
                 authorities);
     }
 
+    @Override
+    @Transactional
+    public User changePassword(ChangPassword changePasswordDto) {
+        if (changePasswordDto.getOldPassword().equals(changePasswordDto.getNewPassword())) {
+            throw new BusinessException("New password must be different from old password");
+        }
+
+        User existingUser = userRepository.findByUsername(changePasswordDto.getUsername());
+        if (existingUser == null) {
+            throw new BusinessException("User not found");
+        }
+
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), existingUser.getPassword())) {
+            throw new BusinessException("Old password is incorrect");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
+        existingUser.setPassword(encodedNewPassword);
+
+        return userRepository.save(existingUser);
+    }
+
+    @Override
+    @Transactional
+    public String softDeleteUser(Integer userId) {
+
+        if (userId == null) {
+            throw new BusinessException("UserId must not be Null");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found"));
+
+        // Đánh dấu user là deleted
+        user.setDeleted(true);
+        userRepository.save(user);
+
+        return "Soft delete user successfully with UserID: " + userId;
+    }
 }
